@@ -13,6 +13,7 @@ import List from '../page/post/List.vue'
 Vue.use(Router) 
  
 export default new Router({
+  mode: 'history',
   routes: [   
     // 로그인/가입
     { 

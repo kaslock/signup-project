@@ -14,7 +14,7 @@
                         id="password"
                         placeholder="영문, 숫자 혼용 8자 이상"/>
                 </div>
-                <button class="btn btn--back btn--login">
+                <button class="btn btn--back btn--login" v-on:click="login()">
                     로그인 하기
                 </button>
                 <div class="add-option">
@@ -24,19 +24,17 @@
                             회원가입
                         </router-link>
                     </div>
-
                 </div>
             </div>
-            
         </div>
-
     </div>
 </template>
 
 <script>
-    import '../../assets/css/user.scss'
-    import constants from '../../lib/constants'
-    
+    import '../../assets/css/user.scss';
+    import constants from '../../lib/constants';
+    import axios from "axios";
+
     export default {
         components: {
         },
@@ -45,13 +43,24 @@
         watch: {
         },
         methods: {
+            async login() {
+                const email = this.email;
+                const password = this.password;
+                if (email && password) { // 비밀번호 조건 변경
+                    try{
+                        const {data} = await axios.get(`http://localhost:8080/account/login?email=${email}&password=${password}`);
+                    } catch(error) {
+                        console.log(error);
+                    }
+                }
+            }
+
         },
         data: () => {
             return {
                 constants,
                 email: '',
                 password: '',
-
             }
         }
 
