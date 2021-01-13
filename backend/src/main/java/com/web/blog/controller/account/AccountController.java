@@ -62,11 +62,21 @@ public class AccountController {
     public Object signup(@Valid @RequestBody SignupRequest request) {
         // 이메일, 닉네임 중복처리 필수
         // 회원가입단을 생성해 보세요.
-
-        final BasicResponse result = new BasicResponse();
+    	
+    	String email = request.getEmail();
+    	String password = request.getPassword();
+    	String nickname = request.getNickname();
+    	
+    	userDao.findUserByEmailAndPassword(email, password)
+	    	.ifPresent(m -> {
+	    		throw new IllegalStateException("이미 존재하는 회원입니다.");
+	    	});
+    	
+    	System.out.println("dkdkdk: ");
+    	
+    	final BasicResponse result = new BasicResponse();
         result.status = true;
         result.data = "success";
-
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

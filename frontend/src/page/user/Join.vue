@@ -61,6 +61,7 @@
 
 <script>
     import '../../assets/css/user.scss'
+    import axios from "axios";
 
     export default {
         components: {
@@ -69,9 +70,15 @@
         },
         methods: {
              async signup() {
+                const nickname = this.nickName;
+                const email = this.email;
+                const password = this.password;
+                
                 if (this.valid()) {
                     try{
-                        // const {data} = await axios.post("http://localhost:8080/account/signup");
+                        const {data} = await axios.post("http://localhost:8080/account/signup", {
+                            email, nickname, password
+                        });
                     } catch(error) {
                         console.log(error);
                     }
