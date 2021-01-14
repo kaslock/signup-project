@@ -10,7 +10,7 @@ export default new Vuex.Store({
     mutations: {
         // state를 변경할때 mutation을 활용
         SET_LOGIN_DATA(state, data){
-        state.loginData = data;
+            state.loginData = data;
         }
     },
     actions: {

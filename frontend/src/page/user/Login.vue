@@ -46,9 +46,22 @@
             async login() {
                 const email = this.email;
                 const password = this.password;
-                if (email && password) { // 비밀번호 조건 변경
+                if (email && password) {
                     try{
-                        const {data} = await axios.get(`http://localhost:8080/account/login?email=${email}&password=${password}`);
+                        const {data} = await axios.post("http://localhost:8080/account/login", {
+                            email, password
+                        });
+                        console.log(data);
+                        
+                        if (data.data) {
+                            sessionStorage.setItem("id", email);
+                            this.$store.commit("SET_LOGIN_DATA", email);
+                            this.$router.push("/");
+                        }
+                        else {
+                            alert("로그인 실패");
+                        }
+
                     } catch(error) {
                         console.log(error);
                     }

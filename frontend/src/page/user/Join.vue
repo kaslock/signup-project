@@ -79,6 +79,17 @@
                         const {data} = await axios.post("http://localhost:8080/account/signup", {
                             email, nickname, password
                         });
+                        
+                        const duplicateCheck = data.data;
+                        
+                        console.log(duplicateCheck);
+                        if (duplicateCheck == "success") {
+                            alert("인증 메일이 발송되었습니다.");
+                            this.$router.push("/user/login");
+                        } else {
+                            alert(duplicateCheck);
+                        }
+
                     } catch(error) {
                         console.log(error);
                     }
@@ -128,7 +139,7 @@
                     return false;
                 }
                 else {
-                    console.log("password check success"); 
+                    // console.log("password check success"); 
                     return true;
                 }
             }

@@ -11,9 +11,14 @@
                 <input v-model="keyword" type="text"/>
             </div> 
             
-            <router-link v-bind:to="{name:constants.URL_TYPE.USER.LOGIN}" class="login-btn">
-                로그인 
-            </router-link>  
+                <a @click="logout" class="login-btn" style="color:black" v-if="isLoggedIn">
+                    로그아웃
+                </a>
+
+                <router-link v-bind:to="{name:constants.URL_TYPE.USER.LOGIN}" class="login-btn" v-else>
+                    로그인
+                </router-link>
+            
             
         </div>  
         
@@ -30,12 +35,23 @@
         },
         props: ['isHeader'],
         computed:{
+            isLoggedIn() {
+                return this.$store.state.loginData;
+            }
         },
         watch: {
         },
         created() {
         },
         methods : {
+            logout(){
+                sessionStorage.removeItem("id");
+                this.$store.commit("SET_LOGIN_DATA", "");
+                this.$router.push("/user/login");
+            }
+        },
+        mounted(){
+
         },
         data: function() {
            return {

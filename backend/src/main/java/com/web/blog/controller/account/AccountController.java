@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import com.web.blog.dao.user.UserDao;
 import com.web.blog.model.BasicResponse;
+import com.web.blog.model.user.AuthenticationRequest;
 import com.web.blog.model.user.SignupRequest;
 import com.web.blog.model.user.User;
 
@@ -23,6 +24,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.LocalDateTime;
+
 @ApiResponses(value = { @ApiResponse(code = 401, message = "Unauthorized", response = BasicResponse.class),
         @ApiResponse(code = 403, message = "Forbidden", response = BasicResponse.class),
         @ApiResponse(code = 404, message = "Not Found", response = BasicResponse.class),
@@ -35,25 +38,23 @@ public class AccountController {
     @Autowired
     UserDao userDao;
 
-    @GetMapping("/account/login")
+    @PostMapping("/account/login")
     @ApiOperation(value = "로그인")
-    public Object login(@RequestParam(required = true) final String email,
-            @RequestParam(required = true) final String password) {
+    public Object login(@Valid @RequestBody AuthenticationRequest request) {
 
+    	String email = request.getEmail();
+    	String password = request.getPassword();
+    	
         Optional<User> userOpt = userDao.findUserByEmailAndPassword(email, password);
-
-        ResponseEntity response = null;
 
         if (userOpt.isPresent()) {
             final BasicResponse result = new BasicResponse();
             result.status = true;
             result.data = "success";
-            response = new ResponseEntity<>(result, HttpStatus.OK);
+            return new ResponseEntity<>(result, HttpStatus.OK);
         } else {
-            response = new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-
-        return response;
     }
 
     @PostMapping("/account/signup")
@@ -65,19 +66,41 @@ public class AccountController {
     	
     	String email = request.getEmail();
     	String password = request.getPassword();
-    	String nickname = request.getNickname();
+    	String uid = request.getNickname();
+    	LocalDateTime createDate = LocalDateTime.now();
     	
-    	userDao.findUserByEmailAndPassword(email, password)
-	    	.ifPresent(m -> {
-	    		throw new IllegalStateException("이미 존재하는 회원입니다.");
-	    	});
+    	User user = new User();
     	
-    	System.out.println("dkdkdk: ");
+    	user.setUid(uid);
+    	user.setEmail(email);
+    	user.setPassword(password);
+    	user.setCreateDate(createDate);
+    	
     	
     	final BasicResponse result = new BasicResponse();
-        result.status = true;
-        result.data = "success";
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        
+    	try {
+	    	userDao.getUserByUid(uid)
+		    	.ifPresent(m -> {		
+		    		throw new IllegalStateException("이미 존재하는 회원입니다.");		    		
+		    	});
+
+	    	userDao.getUserByEmail(email)
+		    	.ifPresent(m -> {		
+		    		throw new IllegalStateException("이미 존재하는 이메일입니다.");
+		    	});
+	    	
+	    	userDao.save(user);
+	    	result.status = true;
+	        result.data = "success";
+	        return new ResponseEntity<>(result, HttpStatus.OK);
+	        
+    	} catch(IllegalStateException e) {
+    		System.out.println("aaaaa: " + e);
+    		result.status = true;
+	        result.data = e.getMessage();
+	        return new ResponseEntity<>(result, HttpStatus.CONFLICT);
+    	}
     }
 
 }
