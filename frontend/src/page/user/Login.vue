@@ -46,14 +46,14 @@
             async login() {
                 const email = this.email;
                 const password = this.password;
-                if (email && password) {
+                if (email && password) {                                 
                     try{
                         const {data} = await axios.post("http://localhost:8080/account/login", {
                             email, password
                         });
-                        console.log(data);
+                        // console.log(data);
                         
-                        if (data.data) {
+                        if (data.data == "success") {
                             sessionStorage.setItem("id", email);
                             this.$store.commit("SET_LOGIN_DATA", email);
                             this.$router.push("/");

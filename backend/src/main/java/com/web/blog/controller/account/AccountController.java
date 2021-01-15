@@ -13,8 +13,8 @@ import com.web.blog.model.user.User;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+//import org.springframework.web.bind.annotation.GetMapping;
+//import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,7 +26,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
 
-@ApiResponses(value = { @ApiResponse(code = 401, message = "Unauthorized", response = BasicResponse.class),
+@ApiResponses(value = { 
+		@ApiResponse(code = 401, message = "Unauthorized", response = BasicResponse.class),
         @ApiResponse(code = 403, message = "Forbidden", response = BasicResponse.class),
         @ApiResponse(code = 404, message = "Not Found", response = BasicResponse.class),
         @ApiResponse(code = 500, message = "Failure", response = BasicResponse.class) })
@@ -45,21 +46,23 @@ public class AccountController {
     	String email = request.getEmail();
     	String password = request.getPassword();
     	
+
         Optional<User> userOpt = userDao.findUserByEmailAndPassword(email, password);
 
-        if (userOpt.isPresent()) {
-            final BasicResponse result = new BasicResponse();
-            result.status = true;
+    	final BasicResponse result = new BasicResponse();
+    	result.status = true;
+
+    	if (userOpt.isPresent()) {
             result.data = "success";
-            return new ResponseEntity<>(result, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            result.data = "로그인 실패";
         }
+    	
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PostMapping("/account/signup")
     @ApiOperation(value = "가입하기")
-
     public Object signup(@Valid @RequestBody SignupRequest request) {
         // 이메일, 닉네임 중복처리 필수
         // 회원가입단을 생성해 보세요.
@@ -93,14 +96,13 @@ public class AccountController {
 	    	userDao.save(user);
 	    	result.status = true;
 	        result.data = "success";
-	        return new ResponseEntity<>(result, HttpStatus.OK);
 	        
     	} catch(IllegalStateException e) {
-    		System.out.println("aaaaa: " + e);
     		result.status = true;
 	        result.data = e.getMessage();
-	        return new ResponseEntity<>(result, HttpStatus.CONFLICT);
     	}
+    	
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 }
